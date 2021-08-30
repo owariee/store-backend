@@ -1,29 +1,14 @@
+import Customer from './Customer';
 import Database from './Database';
+
+import dotenv from 'dotenv';
 import express from 'express';
 
-const db = new Database();
+dotenv.config();
+
 const app = express();
+const db = new Database();
 
-app.get('/', async function(req, res) {
-  const col = await db.getCollection('customers');
+Customer(app, db);
 
-  if(col === null) {
-    res.send("Cannot connect to the database!");
-    return;
-  }
-
-  const results = await col.find().toArray();
-  res.send(results);
-})
-
-app.get('/connect', async function(req, res) {
-  await db.connect();
-  res.send(db.connected);
-})
-
-app.get('/disconnect', async function(req, res) {
-  await db.disconnect();
-  res.send(db.connected);
-})
-
-app.listen(3000);
+app.listen(process.env.EXPRESS_PORT);

@@ -1,5 +1,4 @@
 import { MongoClient } from 'mongodb';
-import 'dotenv/config';
 
 class Database {
   constructor() {
@@ -26,16 +25,17 @@ class Database {
     }
   }
 
-  setSchema(name = process.env.MONGO_SCHEMA) {
-    this.schema = name;
-  }
-
-  async getCollection(name) {
+  async getCollection(name, res) {
     if(!await this.connect()) {
+      res.json({error: "Cannot connect to the database!"});
       return null;
     }
 
     return this.client.db(this.schema).collection(name);
+  }
+
+  setSchema(name = process.env.MONGO_SCHEMA) {
+    this.schema = name;
   }
 }
 
