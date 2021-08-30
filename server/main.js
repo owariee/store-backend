@@ -1,22 +1,29 @@
-const { MongoClient } = require('mongodb');
+import Database from './Database';
+import express from 'express';
 
-const url = 'mongodb://localhost:27017';
-const client = new MongoClient(url);
+const db = new Database();
+const app = express();
 
-const dbName = 'store';
+app.get('/', async function(req, res) {
+  const col = await db.getCollection('customers');
 
-async function main() {
-  await client.connect();
-  console.log('Connected successfully to server');
-  const db = client.db(dbName);
-  const collection = db.collection('documents');
+  if(col === null) {
+    res.send("Cannot connect to the database!");
+    return;
+  }
 
-  // the following code examples can be pasted here...
+  const results = await col.find().toArray();
+  res.send(results);
+})
 
-  return 'done.';
-}
+app.get('/connect', async function(req, res) {
+  await db.connect();
+  res.send(db.connected);
+})
 
-main()
-  .then(console.log)
-  .catch(console.error)
-  .finally(() => client.close());
+app.get('/disconnect', async function(req, res) {
+  await db.disconnect();
+  res.send(db.connected);
+})
+
+app.listen(3000);
