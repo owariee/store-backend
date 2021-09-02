@@ -10,8 +10,9 @@
 // sex
 // gender
 // 
+import Validator from './Validator';
 
-export default function Customer(app, db) {
+function Customer(app, db) {
 	app.get('/customer/:id', async function(req, res) {
 		const col = await db.getCollection('customers', res);
 		if(!col) return;
@@ -25,36 +26,62 @@ export default function Customer(app, db) {
 	});
 
 	app.post('/customer', async function(req, res) {
-		let error = {error: []};
+		//let error = {error: []};
 
-		const name = String(req.body.name);
-		const lastName = String(req.body.lastName);
-		const email = String(req.body.email);
-		const password = String(req.body.password);
+		//const name = String(req.body.name);
+		//const lastName = String(req.body.lastName);
+		//const email = String(req.body.email);
+		//const password = String(req.body.password);
 
-		if(name.length < 3 || name.length > 70) {
-			error.error.push("Invalid 'name' lenght, should be more than 3 and less than 70!");
+		let nameValidatorQuery = {
+			name: "name", //working
+			value: String(req.body.name), //working
+			allowedChars: "abcdefghijklmnopqrstuvwxyz", //working
+			allowedCharsMsg: "alphabet", //working
+			minLen: 4, //working
+			maxLen: 4, //working
+			rules: [
+				{
+					letter: "a", //working
+					minOccurrences: 1, //working
+					maxOccurrences: 1, //working
+					atPos: [1] //working
+				}
+			]
+		};
+
+		let nameValidator = new Validator(nameValidatorQuery);
+
+		if(nameValidator.errors.length) {
+			res.json({errors: nameValidator.errors});
+			return;
 		}
 
-		if(name.match(/\d+/g)) {
-			error.error.push("Field 'name' has invalid characters!");
-		}
+		res.json({errors: null});
 
-		if(lastName.length < 3 || lastName.length > 70) {
-			error.error.push("Invalid 'lastName' lenght, should be more than 3 and less than 70!")
-		}
+		// if(name.length < 3 || name.length > 70) {
+		// 	error.error.push("Invalid 'name' lenght, should be more than 3 and less than 70!");
+		// }
+
+		// if(name.match(/\d+/g)) {
+		// 	error.error.push("Field 'name' has invalid characters!");
+		// }
+
+		// if(lastName.length < 3 || lastName.length > 70) {
+		// 	error.error.push("Invalid 'lastName' lenght, should be more than 3 and less than 70!")
+		// }
 		
-		if(name.match(/\d+/g)) {
-			error.error.push("Field 'lastName' has invalid characters!");
-		}
+		// if(name.match(/\d+/g)) {
+		// 	error.error.push("Field 'lastName' has invalid characters!");
+		// }
 
-		if(email.length < 6 || email.length > 254) {
-			error.error.push("Invalid 'email' lenght, should be more than 6 and less than 254 characters!");
-		}
+		// if(email.length < 6 || email.length > 254) {
+		// 	error.error.push("Invalid 'email' lenght, should be more than 6 and less than 254 characters!");
+		// }
 
-		if(0 > email.match(/@/g).length() > 1) {
-			error.error.push("Invalid 'email' format!");
-		}
+		// if(0 > email.match(/@/g).length() > 1) {
+		// 	error.error.push("Invalid 'email' format!");
+		// }
 
 
 
@@ -71,3 +98,5 @@ export default function Customer(app, db) {
 
 	});
 }
+
+export default Customer;
