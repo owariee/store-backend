@@ -53,7 +53,7 @@ function Customer(app, db) {
 		let nameValidator = new Validator(nameValidatorQuery);
 
 		if(nameValidator.errors.length) {
-			res.json({errors: nameValidator.errors});
+			res.json({error: {field: {name: nameValidator.errors}}});
 			return;
 		}
 

@@ -20,13 +20,13 @@ class Validator {
     this.config = config;
     this.errors = [];
     this.messages = {
-      lenLargerThanMax: "Field '$name' exceeds maximum length of '$maxLen'",
-      lenLowerThanMin: "Field '$name' has length less than minimum of '$minLen'",
-      invalidCharacter: "Field '$name' only allows characters from '$allowedCharsMsg'",
-      moreThanMaxOccurrences: "Field '$name' has more occurrences of character '$rules/letter' than the maximum of '$rules/maxOccurrences'",
-      lessThanMinOccurrences: "Field '$name' has less occurrences of character '$rules/letter' than the minimum of '$rules/minOccurrences'",
-      invalidCharPosition: "Field '$name' has a character '$rules/letter' in invalid position",
-      invalidCharsPosition: "Field '$name' has multiple characters '$rules/letter' in invalid position"
+      lenLargerThanMax: "exceeds maximum length of '$maxLen'",
+      lenLowerThanMin: "has length less than minimum of '$minLen'",
+      invalidCharacter: "only allows characters from '$allowedCharsMsg'",
+      moreThanMaxOccurrences: "more occurrences of '$rules/letter' than the maximum of '$rules/maxOccurrences'",
+      lessThanMinOccurrences: "less occurrences of '$rules/letter' than the minimum of '$rules/minOccurrences'",
+      invalidCharPosition: "has a character '$rules/letter' in invalid position",
+      invalidCharsPosition: "has multiple characters '$rules/letter' in invalid position"
     };
     this.checkLength();
     this.checkAllowedChars();
@@ -43,7 +43,7 @@ class Validator {
         if(argument.length > 1 && rulePos !== null) {
           msgResult += "'" + this.config[argument[0]][rulePos][argument[1]] + "'";
         } else {
-          msgResult += "'" + this.config[argument[0]] + "'";
+          msgResult += this.config[argument[0]];
         }
       } else {
         msgResult += variable;
@@ -56,10 +56,11 @@ class Validator {
     const valueLen = this.config.value.length;
     const maxLen = this.config.maxLen;
     const minLen = this.config.minLen;
-    if(valueLen > maxLen) {
+
+    if(maxLen !== undefined && maxLen !== -1 && valueLen > maxLen) {
       this.addMessage("lenLargerThanMax");
     }
-    if(valueLen < minLen) {
+    if(minLen !== undefined && minLen !== -1 && valueLen < minLen) {
       this.addMessage("lenLowerThanMin");
     }
   }
