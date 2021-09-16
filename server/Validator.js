@@ -1,3 +1,6 @@
+//
+// Example validator config:
+//
 // {
 //   name: "email"
 //   value: "words and more words!",
@@ -14,20 +17,39 @@
 //       },
 //   ]
 // }
+//
 
 class Validator {
-  constructor(config) {
+  constructor(config, req) {
     this.config = config;
+    this.req = req;
     this.errors = [];
     this.messages = {
-      lenLargerThanMax: "exceeds maximum length of '$maxLen'",
-      lenLowerThanMin: "has length less than minimum of '$minLen'",
-      invalidCharacter: "only allows characters from '$allowedCharsMsg'",
-      moreThanMaxOccurrences: "more occurrences of '$rules/letter' than the maximum of '$rules/maxOccurrences'",
-      lessThanMinOccurrences: "less occurrences of '$rules/letter' than the minimum of '$rules/minOccurrences'",
-      invalidCharPosition: "has a character '$rules/letter' in invalid position",
-      invalidCharsPosition: "has multiple characters '$rules/letter' in invalid position"
+      en: {
+        lenLargerThanMax: "exceeds maximum length of '$maxLen'",
+        lenLowerThanMin: "has length less than minimum of '$minLen'",
+        invalidCharacter: "only allows characters from '$allowedCharsMsg'",
+        moreThanMaxOccurrences: "more occurrences of '$rules/letter' than the maximum of '$rules/maxOccurrences'",
+        lessThanMinOccurrences: "less occurrences of '$rules/letter' than the minimum of '$rules/minOccurrences'",
+        invalidCharPosition: "has a character '$rules/letter' in invalid position",
+        invalidCharsPosition: "has multiple characters '$rules/letter' in invalid position"
+      },
+      pt: {
+        lenLargerThanMax: "excede o tamanho máximo de '$maxLen'",
+        lenLowerThanMin: "tem tamanho menor que o mínimo de '$minLen'",
+        invalidCharacter: "carácter inválido",
+        moreThanMaxOccurrences: "mais ocorrências de '$rules/letter' que o máximo de '$rules/maxOccurrences'",
+        lessThanMinOccurrences: "menos ocorrências de '$rules/letter' que o mínimo de '$rules/minOccurrences'",
+        invalidCharPosition: "caracter '$rules/letter' em posição invalida",
+        invalidCharsPosition: "tem multiplos caractere '$rules/letter' em posições invalidas"
+      }
     };
+    if(this.config.)
+    if(this.checkKey(process.env.VALIDATOR_LANG)) {
+      this.lang = 'en';
+    } else {
+      this.lang = process.env.VALIDATOR_LANG;
+    }
     this.checkLength();
     this.checkAllowedChars();
     this.checkCharOccurrences();
@@ -36,7 +58,7 @@ class Validator {
 
   addMessage(name, rulePos = null) {
     let msgResult = "";
-    const msgArray = this.messages[name].split("'");
+    const msgArray = this.messages[this.lang][name].split("'");
     msgArray.forEach(variable => {
       if(variable[0] == "$") {
         let argument = variable.substr(1).split("/");
@@ -52,21 +74,30 @@ class Validator {
     this.errors.push(msgResult);
   }
 
+  checkKey(parm) {
+    return !(parm === undefined || parm === null || parm === -1);
+  }
+
   checkLength() {
     const valueLen = this.config.value.length;
     const maxLen = this.config.maxLen;
     const minLen = this.config.minLen;
 
-    if(maxLen !== undefined && maxLen !== -1 && valueLen > maxLen) {
+    if(this.checkKey(maxLen) && valueLen > maxLen) {
       this.addMessage("lenLargerThanMax");
     }
-    if(minLen !== undefined && minLen !== -1 && valueLen < minLen) {
+    if(this.checkKey(minLen) && valueLen < minLen) {
       this.addMessage("lenLowerThanMin");
     }
   }
 
   checkAllowedChars() {
     const value = this.config.value.split('');
+
+    if(!this.checkKey(this.config.allowedChars)) {
+      return;
+    }
+
     const allowedChars = this.config.allowedChars.split('');
 
     const result = value.every(char => {

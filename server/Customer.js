@@ -33,24 +33,34 @@ function Customer(app, db) {
 		//const email = String(req.body.email);
 		//const password = String(req.body.password);
 
-		let nameValidatorQuery = {
-			name: "name", //working
-			value: String(req.body.name), //working
-			allowedChars: "abcdefghijklmnopqrstuvwxyz", //working
-			allowedCharsMsg: "alphabet", //working
-			minLen: 4, //working
-			maxLen: 4, //working
+
+		//value: String(req.body.name),
+
+		let nameValidator = new Validator({
+			name: {
+				pt: "nome",
+				en: "name"
+			},
+			allowed: {
+				character: "abcdefghijklmnopqrstuvwxyz",
+				message: {
+					pt: "alfabeto",
+					en: "alphabet"
+				}
+			},
+			lenght: {
+				min: 4,
+				max: 4
+			}
 			rules: [
 				{
-					letter: "a", //working
-					minOccurrences: 1, //working
-					maxOccurrences: 1, //working
-					atPos: [1] //working
+					letter: "a",
+					minOccurrences: 1,
+					maxOccurrences: 1,
+					atPos: [1]
 				}
 			]
-		};
-
-		let nameValidator = new Validator(nameValidatorQuery);
+		}, req);
 
 		if(nameValidator.errors.length) {
 			res.json({error: {field: {name: nameValidator.errors}}});
