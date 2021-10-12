@@ -5,51 +5,11 @@
 // sex
 // 
 
-import Checker from './Checker';
+//import Checker from './Checker';
+import CustomerSchema from './CustomerSchema';
+import JoiConfig from './JoiConfig';
 
 function Customer(app, db) {
-	let ruleFirstName = {
-		field: "firstName",
-		allowedChars: "a-zA-Z0-9 !@#$%^&*()_+=~`´'\"",
-		len: "3,120",
-		rules: [ /^.{1,2}[a]{1}/, ]
-	};
-
-	let ruleLastName = {
-		field: "lastName",
-		allowedChars: "a-zA-Z0-9!@#$%^&*()_+=~`´'\"",
-		len: "3,120",
-		rules: [ /^.{1,2}[a]{1}/, ]
-	};
-
-	let ruleEmail = {
-		field: "email",
-		allowedChars: "a-zA-Z0-9!@#$%^&*()_+=~`´'\"",
-		len: "3,120",
-		rules: [ /^.{1,2}[a]{1}/, ]
-	};
-
-	let rulePassword = {
-		field: "password",
-		allowedChars: "a-zA-Z0-9!@#$%^&*()_+=~`´'\"",
-		len: "3,120",
-		rules: [ /^.{1,2}[a]{1}/, ]
-	};
-
-	let ruleCPF = {
-		field: "cpf",
-		allowedChars: "a-zA-Z0-9!@#$%^&*()_+=~`´'\"",
-		len: "3,120",
-		rules: [ /^.{1,2}[a]{1}/, ]
-	};
-
-	let ruleGender = {
-		field: "gender",
-		allowedChars: "a-zA-Z0-9!@#$%^&*()_+=~`´'\"",
-		len: "3,120",
-		rules: [ /^.{1,2}[a]{1}/, ]
-	};
-
 	app.get('/customer/:id', async function(req, res) {
 		const col = await db.getCollection('customers', res);
 		if(!col) return;
@@ -63,24 +23,31 @@ function Customer(app, db) {
 	});
 
 	app.post('/customer', async function(req, res) {
-		const checker = new Checker(req.body);
+		const postSchema = CustomerSchema.tailor('post');
+		const result = postSchema.validate(req.body, JoiConfig);
 
-		const fields = [
-			ruleFirstName,
-			ruleLastName,
-			ruleEmail,
-			rulePassword,
-			ruleCPF,
-			ruleGender
-		];
-
-		checker.validateFields(fields);
-
-		if(!checker.errors.length) {
-			//insert in the DB
+		if(result.error) {
+			req.res.json({error: result.error.details});
+			return;
 		}
 
-		checker.sendStatus(res);
+		const col = await db.getCollection('customers', res)
+		if(!col) {
+			req.res.json({error: 'unable to contact database'});
+			return;
+		}
+
+		const query = await col.find().sort({id: -1}).limit(1).toArray();
+		let lastId = -1;
+
+		if(query[0] !== undefined) {
+			lastId = query[0].id;
+		}
+		
+		delete result.value.repeatPassword;
+		col.insertOne({ id: ++lastId, ...result.value });
+		req.res.json({error: 'success'});
+		return;
 	});
 
 	app.put('/customer/:id', async function(req, res) {
