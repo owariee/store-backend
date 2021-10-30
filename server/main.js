@@ -1,17 +1,25 @@
 import Customer from './Customer';
-import Database from './Database';
 
 import dotenv from 'dotenv';
 import express from 'express';
+import { MongoClient } from 'mongodb';
 
 dotenv.config();
 
-const app = express();
-const db = new Database();
+const dbUrl = process.env.DB_URL || 'mongodb://localhost:27017/';
+const dbName = process.env.DB_NAME || 'store';
+const port = process.env.PORT || 3000;
 
-app.use(express.json());
-app.use(express.urlencoded({extended: true}));
+MongoClient.connect(dbUrl).then(client => {
+  const app = express();
+  const db = client.db(dbName);
+  const server = app.listen(port);
+  
+  app.use(express.json());
+  app.use(express.urlencoded({extended: true}));
 
-Customer(app, db);
-
-app.listen(process.env.EXPRESS_PORT);
+  Customer(app, db);
+}).catch((err) => {
+  console.error(`Cannot connect to the database!${err}`);
+});
+//.finally(() => client.close());

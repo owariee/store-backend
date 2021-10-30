@@ -1,12 +1,11 @@
 import Joi from 'joi';
 
 const CustomerSchema = Joi.object({
-  objectId: Joi.string()
-    .alphanum()
-    .min(24)
-    .max(24)
+  id: Joi.number()
+    .min(0)
+    .max(9999)
     .alter({
-      get: (schema) => schema.required(),
+      get: (schema) => schema.optional(),
       post: (schema) => schema.forbidden(),
       put: (schema) => schema.required(),
       delete: (schema) => schema.required()

@@ -1,0 +1,14 @@
+/customer/ -- display all customers
+/customer/:id/ -- display specific customer
+/customer/schema/ -- view the JSON schema for this resource
+
+GET     /product/     -- display all products                             enables count and page
+POST    /product/     -- register a product                               recieves body with parameters
+GET     /product/:id/ -- display specific product                         receive only the id
+PUT     /product/:id/ -- update specific product                          receive the id and json with parms to be changed
+DELETE  /product/:id/ -- delete specific product                          receive only the id
+GET     /product/schema/ -- view the JSON schema for this resource        receive nothing and return the schema
+
+/category/ -- display all categories
+/category/:id/ -- display 
+/category/schema/ -- view the JSON schema for this resource
