@@ -16,4 +16,3 @@ function DBDelete(collection) {
 }
 
 export default DBDelete;
-

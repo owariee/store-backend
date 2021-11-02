@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "target": "ES3",
+    "watch": true,
+    "lib": ["ES2017"],
+    "esModuleInterop": true,
+    "importHelpers": true
+  }
+}
