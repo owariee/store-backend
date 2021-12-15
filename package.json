@@ -8,7 +8,7 @@
   },
   "scripts": {
     "start": "node ./src/main.js",
-    "build": "tsc ./src/main.ts",
+    "build": "tsc",
     "dev": "nodemon ./src/main.ts",
     "clean": "rm -rf ./src/*.js ./src/**/*.js"
   },
